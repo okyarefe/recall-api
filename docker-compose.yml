@@ -1,0 +1,27 @@
+services:
+  postgres:
+    # pgvector/pgvector ships Postgres with the pgvector extension preinstalled,
+    # so we don't have to compile it ourselves. pg17 = Postgres 17.
+    image: pgvector/pgvector:pg17
+    container_name: recall-postgres
+    restart: unless-stopped
+    environment:
+      # On first boot the image auto-creates this user/password/database.
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pwd123
+      POSTGRES_DB: recall_database
+    ports:
+      # host:container — exposes the DB on localhost:5432 for the app to connect to.
+      - '5432:5432'
+    volumes:
+      # Named volume persists data across `docker compose down`/`up`.
+      - recall_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # Lets Docker know when Postgres is actually ready to accept connections.
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d recall_database']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  recall_pgdata:
