@@ -1,26 +1,29 @@
 import { Injectable } from '@nestjs/common';
+import { EntriesRepository } from './entries.repository';
 import { CreateEntryDto } from './dto/create-entry.dto';
-import { UpdateEntryDto } from './dto/update-entry.dto';
 
 @Injectable()
 export class EntriesService {
-  create(createEntryDto: CreateEntryDto) {
-    return 'This action adds a new entry';
+  constructor(private readonly entriesRepository: EntriesRepository) {}
+
+  create(userId: string, dto: CreateEntryDto) {
+    return this.entriesRepository.create({
+      userId,
+      type: dto.type,
+      content: dto.content ?? null,
+      sourceUrl: dto.sourceUrl ?? null,
+    });
   }
 
-  findAll() {
-    return `This action returns all entries`;
+  findAll(userId: string) {
+    return this.entriesRepository.findByUser(userId);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} entry`;
+  findOne(userId: string, id: string) {
+    return this.entriesRepository.findOneOwned(userId, id);
   }
 
-  update(id: number, updateEntryDto: UpdateEntryDto) {
-    return `This action updates a #${id} entry`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} entry`;
+  remove(userId: string, id: string) {
+    return this.entriesRepository.deleteOwned(userId, id);
   }
 }
