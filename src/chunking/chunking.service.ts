@@ -8,6 +8,9 @@ export class ChunkingService {
 
   constructor() {
     const encoder = getEncoding('cl100k_base');
+    // TODO: chunk size strategy per content type — tune chunkSize/overlap and use
+    // structure-aware splitting (e.g. per section/project) for structured docs;
+    // smaller chunks sharpen retrieval precision, larger keep more context.
     this.splitter = new RecursiveCharacterTextSplitter({
       chunkSize: 512,
       chunkOverlap: 64,

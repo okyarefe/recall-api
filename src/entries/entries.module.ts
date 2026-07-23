@@ -20,6 +20,6 @@ import { EmbeddingsModule } from '../embeddings/embeddings.module';
   ],
   controllers: [EntriesController],
   providers: [EntriesService, EntriesRepository, EntryChunksRepository],
-  exports: [EntriesRepository],
+  exports: [EntriesRepository, EntryChunksRepository],
 })
 export class EntriesModule {}

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
-import { LlmProvider } from './llm.interface';
+import { LlmGenerateParams, LlmProvider } from './llm.interface';
 
 @Injectable()
 export class OpenAiLlmProvider implements LlmProvider {
@@ -14,10 +14,15 @@ export class OpenAiLlmProvider implements LlmProvider {
     });
   }
 
-  async generate(prompt: string): Promise<string> {
+  async generate({ system, user }: LlmGenerateParams): Promise<string> {
+    const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
+    if (system) {
+      messages.push({ role: 'system', content: system });
+    }
+    messages.push({ role: 'user', content: user });
     const response = await this.client.chat.completions.create({
       model: this.model,
-      messages: [{ role: 'user', content: prompt }],
+      messages,
     });
     return response.choices[0]?.message?.content ?? '';
   }

@@ -19,4 +19,19 @@ export class EntryChunksRepository {
     const chunks = this.repo.create(inputs);
     return this.repo.save(chunks);
   }
+
+  search(
+    userId: string,
+    queryVector: number[],
+    limit: number,
+  ): Promise<EntryChunk[]> {
+    const vector = `[${queryVector.join(',')}]`;
+    return this.repo
+      .createQueryBuilder('chunk')
+      .where('chunk.userId = :userId', { userId })
+      .orderBy('chunk.embedding <=> CAST(:vector AS vector)', 'ASC')
+      .setParameter('vector', vector)
+      .limit(limit)
+      .getMany();
+  }
 }
