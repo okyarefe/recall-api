@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import 'multer';
 import { EntriesService } from './entries.service';
 import { CreateEntryDto } from './dto/create-entry.dto';
 
@@ -11,6 +24,24 @@ export class EntriesController {
   @Post()
   create(@Body() createEntryDto: CreateEntryDto) {
     return this.entriesService.create(TEMP_USER_ID, createEntryDto);
+  }
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async upload(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 })],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    return this.entriesService.createFileEntry(
+      TEMP_USER_ID,
+      file.buffer,
+      file.originalname,
+      file.mimetype,
+    );
   }
 
   @Get()

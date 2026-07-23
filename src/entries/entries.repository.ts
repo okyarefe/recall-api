@@ -3,10 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Entry } from './entities/entry.entity';
 
-export type CreateEntryInput = Pick<
-  Entry,
-  'userId' | 'type' | 'content' | 'sourceUrl'
->;
+export type CreateEntryInput = Pick<Entry, 'userId' | 'type'> &
+  Partial<Pick<Entry, 'content' | 'sourceUrl' | 'fileKey'>>;
 
 @Injectable()
 export class EntriesRepository {
