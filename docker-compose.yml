@@ -16,6 +16,8 @@ services:
     volumes:
       # Named volume persists data across `docker compose down`/`up`.
       - recall_pgdata:/var/lib/postgresql/data
+      # Runs once, on first boot of an empty volume: creates recall_test + extensions.
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     healthcheck:
       # Lets Docker know when Postgres is actually ready to accept connections.
       test: ['CMD-SHELL', 'pg_isready -U postgres -d recall_database']

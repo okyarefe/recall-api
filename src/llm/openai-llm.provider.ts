@@ -10,7 +10,7 @@ export class OpenAiLlmProvider implements LlmProvider {
 
   constructor(private readonly config: ConfigService) {
     this.client = new OpenAI({
-      apiKey: this.config.get<string>('OPEN_AI_KEY'),
+      apiKey: this.config.getOrThrow<string>('openai.apiKey'),
     });
   }
 
