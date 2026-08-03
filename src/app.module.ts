@@ -14,6 +14,10 @@ import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import openaiConfig from './config/openai.config';
 import { Environment, validate } from './config/env.validation';
+import jwtConfig from './config/jwt.config';
+import { AuthModule } from './auth/auth.module';
+import { TestModule } from './test/test.module';
+import { User } from './auth/entities/user.entity';
 
 const nodeEnv = (process.env.NODE_ENV ??
   Environment.Development) as Environment;
@@ -28,7 +32,7 @@ const isDeployed =
       cache: true,
       envFilePath: `.env.${nodeEnv}`,
       ignoreEnvFile: isDeployed,
-      load: [appConfig, databaseConfig, openaiConfig],
+      load: [appConfig, databaseConfig, openaiConfig, jwtConfig],
       validate,
     }),
     TypeOrmModule.forRootAsync({
@@ -36,7 +40,7 @@ const isDeployed =
       useFactory: (config: ConfigService): TypeOrmModuleOptions => ({
         type: 'postgres',
         url: config.getOrThrow<string>('database.url'),
-        entities: [Entry, EntryChunk],
+        entities: [Entry, EntryChunk, User],
         synchronize: config.getOrThrow<boolean>('database.synchronize'),
         logging: config.getOrThrow<boolean>('database.logging'),
         ssl: config.getOrThrow<boolean>('database.ssl')
@@ -48,6 +52,8 @@ const isDeployed =
     LlmModule,
     SearchModule,
     QaModule,
+    AuthModule,
+    TestModule,
   ],
   controllers: [AppController],
   providers: [AppService],

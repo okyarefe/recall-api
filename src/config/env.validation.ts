@@ -6,6 +6,7 @@ import {
   IsString,
   Max,
   Min,
+  MinLength,
   ValidateIf,
   validateSync,
 } from 'class-validator';
@@ -33,6 +34,14 @@ class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   OPENAI_API_KEY!: string;
+
+  @IsString()
+  @MinLength(32)
+  JWT_SECRET!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_EXPIRES_IN!: string;
 
   @ValidateIf(
     (vars: EnvironmentVariables) =>
