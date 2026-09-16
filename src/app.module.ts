@@ -4,20 +4,20 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { LoggerMiddleware } from './common/logger.middleware';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { EntriesModule } from './entries/entries.module';
-import { Entry } from './entries/entities/entry.entity';
-import { EntryChunk } from './entries/entities/entry-chunk.entity';
-import { LlmModule } from './llm/llm.module';
-import { SearchModule } from './search/search.module';
-import { QaModule } from './qa/qa.module';
+import { EntriesModule } from './features/entries/entries.module';
+import { Entry } from './features/entries/entities/entry.entity';
+import { EntryChunk } from './features/entries/entities/entry-chunk.entity';
+import { LlmModule } from './infrastructure/llm/llm.module';
+import { SearchModule } from './features/search/search.module';
+import { QaModule } from './features/qa/qa.module';
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import openaiConfig from './config/openai.config';
 import { Environment, validate } from './config/env.validation';
 import jwtConfig from './config/jwt.config';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './features/auth/auth.module';
 import { TestModule } from './test/test.module';
-import { User } from './auth/entities/user.entity';
+import { User } from './features/auth/entities/user.entity';
 
 const nodeEnv = (process.env.NODE_ENV ??
   Environment.Development) as Environment;

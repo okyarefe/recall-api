@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   EMBEDDINGS_PROVIDER,
   type EmbeddingsProvider,
-} from '../embeddings/embeddings.interface';
+} from '../../infrastructure/embeddings/embeddings.interface';
 import { EntryChunksRepository } from '../entries/entry-chunks.repository';
 
 @Injectable()

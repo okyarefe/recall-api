@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
 export interface JwtPayload {
-  id: number;
+  id: string;
   email: string;
   iat: number;
   exp: number;
@@ -30,9 +30,7 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
 
     const { authorization } = request.headers;
-    console.log('--', authorization);
     const token = authorization?.split(' ')[1];
-    console.log('token', token);
 
     if (!token) {
       throw new UnauthorizedException();
@@ -43,6 +41,7 @@ export class AuthGuard implements CanActivate {
         secret: this.configService.getOrThrow<string>('jwt.secret'),
       });
       request.user = payload;
+      console.log('-----', request.user);
     } catch {
       throw new UnauthorizedException();
     }

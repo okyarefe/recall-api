@@ -9,26 +9,33 @@ import {
   UploadedFile,
   ParseFilePipe,
   MaxFileSizeValidator,
+  UseGuards,
 } from '@nestjs/common';
+
 import { FileInterceptor } from '@nestjs/platform-express';
 import 'multer';
 import { EntriesService } from './entries.service';
 import { CreateEntryDto } from './dto/create-entry.dto';
+import { AuthGuard } from '../auth/auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
-const TEMP_USER_ID = '00000000-0000-0000-0000-000000000000';
-
+@UseGuards(AuthGuard)
 @Controller('entries')
 export class EntriesController {
   constructor(private readonly entriesService: EntriesService) {}
 
   @Post()
-  create(@Body() createEntryDto: CreateEntryDto) {
-    return this.entriesService.create(TEMP_USER_ID, createEntryDto);
+  create(
+    @CurrentUser('id') userId: string,
+    @Body() createEntryDto: CreateEntryDto,
+  ) {
+    return this.entriesService.create(userId, createEntryDto);
   }
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async upload(
+    @CurrentUser('id') userId: string,
     @UploadedFile(
       new ParseFilePipe({
         validators: [new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 })],
@@ -37,7 +44,7 @@ export class EntriesController {
     file: Express.Multer.File,
   ) {
     return this.entriesService.createFileEntry(
-      TEMP_USER_ID,
+      userId,
       file.buffer,
       file.originalname,
       file.mimetype,
@@ -45,17 +52,17 @@ export class EntriesController {
   }
 
   @Get()
-  findAll() {
-    return this.entriesService.findAll(TEMP_USER_ID);
+  findAll(@CurrentUser('id') userId: string) {
+    return this.entriesService.findAll(userId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.entriesService.findOne(TEMP_USER_ID, id);
+  findOne(@CurrentUser('id') userId: string, @Param('id') id: string) {
+    return this.entriesService.findOne(userId, id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.entriesService.remove(TEMP_USER_ID, id);
+  remove(@CurrentUser('id') userId: string, @Param('id') id: string) {
+    return this.entriesService.remove(userId, id);
   }
 }

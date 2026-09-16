@@ -5,13 +5,13 @@ import { Entry } from './entities/entry.entity';
 import {
   STORAGE_PROVIDER,
   type StorageProvider,
-} from '../storage/storage.interface';
-import { ExtractionService } from '../extraction/extraction.service';
-import { ChunkingService } from '../chunking/chunking.service';
+} from '../../infrastructure/storage/storage.interface';
+import { ExtractionService } from './extraction/extraction.service';
+import { ChunkingService } from './chunking/chunking.service';
 import {
   EMBEDDINGS_PROVIDER,
   type EmbeddingsProvider,
-} from '../embeddings/embeddings.interface';
+} from '../../infrastructure/embeddings/embeddings.interface';
 import { EntryChunksRepository } from './entry-chunks.repository';
 
 @Injectable()

@@ -1,5 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { LLM_PROVIDER, type LlmProvider } from '../llm/llm.interface';
+import {
+  LLM_PROVIDER,
+  type LlmProvider,
+} from '../../infrastructure/llm/llm.interface';
 import { SearchService } from '../search/search.service';
 
 @Injectable()

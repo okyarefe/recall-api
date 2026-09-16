@@ -6,10 +6,11 @@ import { EntryChunk } from './entities/entry-chunk.entity';
 import { EntriesRepository } from './entries.repository';
 import { EntryChunksRepository } from './entry-chunks.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { StorageModule } from '../storage/storage.module';
-import { ExtractionModule } from '../extraction/extraction.module';
-import { ChunkingModule } from '../chunking/chunking.module';
-import { EmbeddingsModule } from '../embeddings/embeddings.module';
+import { StorageModule } from '../../infrastructure/storage/storage.module';
+import { ExtractionModule } from './extraction/extraction.module';
+import { ChunkingModule } from './chunking/chunking.module';
+import { EmbeddingsModule } from '../../infrastructure/embeddings/embeddings.module';
+import { AuthModule } from '../auth/auth.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Entry, EntryChunk]),
@@ -17,6 +18,7 @@ import { EmbeddingsModule } from '../embeddings/embeddings.module';
     ExtractionModule,
     ChunkingModule,
     EmbeddingsModule,
+    AuthModule,
   ],
   controllers: [EntriesController],
   providers: [EntriesService, EntriesRepository, EntryChunksRepository],
