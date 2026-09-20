@@ -21,7 +21,12 @@
     "test:watch": "cross-env NODE_ENV=test jest --watch",
     "test:cov": "cross-env NODE_ENV=test jest --coverage",
     "test:debug": "cross-env NODE_ENV=test node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "cross-env NODE_ENV=test jest --config ./test/jest-e2e.json"
+    "test:e2e": "cross-env NODE_ENV=test jest --config ./test/jest-e2e.json",
+    "typeorm": "typeorm-ts-node-commonjs -d src/config/typeorm.config.ts",
+    "migration:generate": "cross-env NODE_ENV=development npm run typeorm -- migration:generate",
+    "migration:create": "typeorm-ts-node-commonjs migration:create",
+    "migration:run": "cross-env NODE_ENV=development npm run typeorm -- migration:run",
+    "migration:revert": "cross-env NODE_ENV=development npm run typeorm -- migration:revert"
   },
   "dependencies": {
     "@langchain/textsplitters": "^1.0.1",
@@ -35,6 +40,7 @@
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
+    "dotenv": "^17.4.1",
     "openai": "^6.48.0",
     "pdf-parse": "^2.4.5",
     "pg": "^8.22.0",

@@ -5,19 +5,16 @@ import { LoggerMiddleware } from './common/logger.middleware';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { EntriesModule } from './features/entries/entries.module';
-import { Entry } from './features/entries/entities/entry.entity';
-import { EntryChunk } from './features/entries/entities/entry-chunk.entity';
 import { LlmModule } from './infrastructure/llm/llm.module';
 import { SearchModule } from './features/search/search.module';
 import { QaModule } from './features/qa/qa.module';
 import appConfig from './config/app.config';
-import databaseConfig from './config/database.config';
+import typeormConfig from './config/typeorm.config';
 import openaiConfig from './config/openai.config';
 import { Environment, validate } from './config/env.validation';
 import jwtConfig from './config/jwt.config';
 import { AuthModule } from './features/auth/auth.module';
 import { TestModule } from './test/test.module';
-import { User } from './features/auth/entities/user.entity';
 
 const nodeEnv = (process.env.NODE_ENV ??
   Environment.Development) as Environment;
@@ -32,21 +29,13 @@ const isDeployed =
       cache: true,
       envFilePath: `.env.${nodeEnv}`,
       ignoreEnvFile: isDeployed,
-      load: [appConfig, databaseConfig, openaiConfig, jwtConfig],
+      load: [appConfig, typeormConfig, openaiConfig, jwtConfig],
       validate,
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService): TypeOrmModuleOptions => ({
-        type: 'postgres',
-        url: config.getOrThrow<string>('database.url'),
-        entities: [Entry, EntryChunk, User],
-        synchronize: config.getOrThrow<boolean>('database.synchronize'),
-        logging: config.getOrThrow<boolean>('database.logging'),
-        ssl: config.getOrThrow<boolean>('database.ssl')
-          ? { rejectUnauthorized: false }
-          : false,
-      }),
+      useFactory: (config: ConfigService): TypeOrmModuleOptions =>
+        config.getOrThrow<TypeOrmModuleOptions>('typeorm'),
     }),
     EntriesModule,
     LlmModule,
