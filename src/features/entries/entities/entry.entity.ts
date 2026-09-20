@@ -3,9 +3,12 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { User } from '../../auth/entities/user.entity';
 
 export const ENTRY_TYPES = ['link', 'note', 'file'] as const;
 export type EntryType = (typeof ENTRY_TYPES)[number];
@@ -26,6 +29,10 @@ export class Entry {
   @Index()
   @Column('uuid')
   userId!: string;
+
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user!: User;
 
   @Column({ type: 'enum', enum: ENTRY_TYPES })
   type!: EntryType;
