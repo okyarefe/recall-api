@@ -13,6 +13,7 @@ import typeormConfig from './config/typeorm.config';
 import openaiConfig from './config/openai.config';
 import { Environment, validate } from './config/env.validation';
 import jwtConfig from './config/jwt.config';
+import googleConfig from './config/google.config';
 import { AuthModule } from './features/auth/auth.module';
 import { TestModule } from './test/test.module';
 
@@ -29,7 +30,7 @@ const isDeployed =
       cache: true,
       envFilePath: `.env.${nodeEnv}`,
       ignoreEnvFile: isDeployed,
-      load: [appConfig, typeormConfig, openaiConfig, jwtConfig],
+      load: [appConfig, typeormConfig, openaiConfig, jwtConfig, googleConfig],
       validate,
     }),
     TypeOrmModule.forRootAsync({

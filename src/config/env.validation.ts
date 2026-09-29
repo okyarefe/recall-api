@@ -43,6 +43,32 @@ class EnvironmentVariables {
   @IsNotEmpty()
   JWT_EXPIRES_IN!: string;
 
+  @IsString()
+  @IsNotEmpty()
+  GOOGLE_CLIENT_ID!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  GOOGLE_CLIENT_SECRET!: string;
+
+  @ValidateIf(
+    (vars: EnvironmentVariables) =>
+      vars.NODE_ENV === Environment.Production ||
+      vars.NODE_ENV === Environment.Staging,
+  )
+  @IsString()
+  @IsNotEmpty()
+  FRONTEND_URL?: string;
+
+  @ValidateIf(
+    (vars: EnvironmentVariables) =>
+      vars.NODE_ENV === Environment.Production ||
+      vars.NODE_ENV === Environment.Staging,
+  )
+  @IsString()
+  @IsNotEmpty()
+  GOOGLE_CALLBACK_URL?: string;
+
   @ValidateIf(
     (vars: EnvironmentVariables) =>
       vars.NODE_ENV === Environment.Production ||
