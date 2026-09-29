@@ -105,8 +105,18 @@ export class AuthService {
       relations: { user: true },
     });
 
-    if (!stored || stored.revokedAt || stored.expiresAt < new Date()) {
+    if (!stored || stored.expiresAt < new Date()) {
       throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    // A used token came back: two parties had a copy, so it was stolen.
+    // We can't tell who is real, so end every session of this user.
+    if (stored.revokedAt) {
+      await this.refreshTokenRepository.update(
+        { userId: stored.userId, revokedAt: IsNull() },
+        { revokedAt: new Date() },
+      );
+      throw new UnauthorizedException('Refresh token reuse detected');
     }
 
     // Revoke only if still unrevoked, so two parallel requests can't both use it
