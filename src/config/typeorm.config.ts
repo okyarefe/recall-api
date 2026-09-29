@@ -5,6 +5,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { Entry } from '../features/entries/entities/entry.entity';
 import { EntryChunk } from '../features/entries/entities/entry-chunk.entity';
 import { User } from '../features/auth/entities/user.entity';
+import { RefreshToken } from '../features/auth/entities/refresh-token.entity';
 import { databaseConnection } from './database.config';
 import { Environment } from './env.validation';
 
@@ -22,7 +23,7 @@ dotenvConfig({ path: `.env.${env}` });
 const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
   ...databaseConnection(),
-  entities: [Entry, EntryChunk, User],
+  entities: [Entry, EntryChunk, User, RefreshToken],
   migrations: [__dirname + '/../migrations/*{.ts,.js}'],
   synchronize: false,
 };
