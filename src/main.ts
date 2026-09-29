@@ -1,12 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { Environment } from './config/env.validation';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
+  // Parses the Cookie header into req.cookies (used by /auth/refresh)
+  app.use(cookieParser());
   app.enableCors({
     origin: config.getOrThrow<string[] | boolean>('app.corsOrigins'),
     credentials: true,
