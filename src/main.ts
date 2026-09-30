@@ -28,4 +28,4 @@ async function bootstrap() {
 
   Logger.log(`Recall API listening on port ${port} [env=${env}]`, 'Bootstrap');
 }
-bootstrap();
+void bootstrap();
