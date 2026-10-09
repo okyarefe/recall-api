@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Post,
   Req,
   Res,
@@ -10,8 +11,11 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GoogleAuthGuard } from './google-auth.guard';
-import type { Request, Response } from 'express';
+import type { CookieOptions, Request, Response } from 'express';
 import { AuthService } from './auth.service';
+// Our JWT guard; aliased so it isn't confused with Passport's AuthGuard
+import { AuthGuard as JwtAuthGuard } from './auth.guard';
+import { CurrentUser } from './decorators/current-user.decorator';
 import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { User } from './entities/user.entity';
@@ -78,17 +82,47 @@ export class AuthController {
     return { accessToken };
   }
 
+  // The guard verifies the access token and puts its payload on req.user,
+  // so the id comes from the token, never from the client's URL/body.
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  me(@CurrentUser('id') userId: string) {
+    return this.authService.getMe(userId);
+  }
+
+  // No JwtAuthGuard: the user must be able to log out even with an expired
+  // access token. The refresh cookie identifies the session.
+  // Always 204: with no cookie or an unknown token, they're logged out anyway.
+  @Post('logout')
+  @HttpCode(204)
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const cookies = req.cookies as Record<string, string | undefined>;
+    const rawToken = cookies.refresh_token;
+    if (rawToken) {
+      await this.authService.logout(rawToken);
+    }
+
+    res.clearCookie('refresh_token', this.refreshCookieOptions());
+  }
+
   private setRefreshCookie(res: Response, token: string) {
     const days = this.configService.getOrThrow<number>(
       'jwt.refreshExpiresInDays',
     );
 
     res.cookie('refresh_token', token, {
+      ...this.refreshCookieOptions(),
+      maxAge: days * 24 * 60 * 60 * 1000,
+    });
+  }
+
+  // Shared by set and clear: the browser only deletes a cookie if path etc. match
+  private refreshCookieOptions(): CookieOptions {
+    return {
       httpOnly: true,
       secure: this.configService.getOrThrow<boolean>('app.isDeployed'),
       sameSite: 'lax',
       path: '/auth',
-      maxAge: days * 24 * 60 * 60 * 1000,
-    });
+    };
   }
 }

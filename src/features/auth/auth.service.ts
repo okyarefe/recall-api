@@ -68,6 +68,21 @@ export class AuthService {
     return this.createAccessToken(user);
   }
 
+  // select: only safe fields, so password/googleId never leave the server
+  async getMe(userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      select: { id: true, email: true },
+    });
+
+    // Token can still be valid after the user was deleted
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    return user;
+  }
+
   // Used by both email/password sign-in and Google sign-in
   async createAccessToken(user: User) {
     const payload = {
@@ -132,6 +147,14 @@ export class AuthService {
     const { accessToken } = await this.createAccessToken(stored.user);
 
     return { accessToken, refreshToken };
+  }
+
+  // Revoke (not delete) so a stolen copy used later still triggers reuse detection
+  async logout(rawToken: string) {
+    await this.refreshTokenRepository.update(
+      { tokenHash: this.hashToken(rawToken), revokedAt: IsNull() },
+      { revokedAt: new Date() },
+    );
   }
 
   private hashToken(rawToken: string): string {
