@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AuthGuard } from '@nestjs/passport';
+import { GoogleAuthGuard } from './google-auth.guard';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -36,7 +36,7 @@ export class AuthController {
   // Step 1 of Google login: the guard redirects the browser to Google.
   // This handler body never runs.
   @Get('google')
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(GoogleAuthGuard)
   googleLogin() {
     console.log('[never] googleLogin handler ran (should not happen)');
   }
@@ -46,7 +46,7 @@ export class AuthController {
   // The browser navigated here (not a fetch), so we set the refresh cookie and
   // send it back to the frontend, which then calls /auth/refresh for an access token.
   @Get('google/callback')
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(GoogleAuthGuard)
   async googleCallback(@Req() req: Request, @Res() res: Response) {
     console.log('[6] googleCallback handler, req.user =', req.user);
     // req.user is whatever GoogleStrategy.validate() returned: a User from our DB
